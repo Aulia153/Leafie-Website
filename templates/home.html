@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leafie</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="navbar">
+    <div class="container">
+      <div class="logo">
+        <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Leafie Logo">
+        <span>Leafie</span>
+      </div>
+      <nav>
+        <a href="#">Home</a>
+        <a href="#">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero">
+    <div class="overlay">
+      <h1>Leafie</h1>
+      <p>Pemantauan dan perawatan bibit alpukat secara real-time dengan teknologi IoT</p>
+      <a href="#" class="btn">Masuk ke Dashboard Pemantauan</a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>© 2025 Leafie — All Rights Reserved</p>
+  </footer>
+
+</body>
+</html>
