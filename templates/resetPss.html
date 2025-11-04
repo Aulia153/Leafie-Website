@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password - Farming Dashboard</title>
+    <link rel="stylesheet" href="/static/css/resetPss.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <div class="logo">🌿</div>
+            <div class="logo-text">Reset Password</div>
+        </div>
+        <a href="index.html" class="nav-link">Home</a>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="reset-container">
+            <!-- Reset Password Info -->
+            <div class="reset-info">
+                <h1>Reset Password</h1>
+                <p>Masukkan password baru:</p>
+            </div>
+
+            <!-- Reset Password Form -->
+            <div class="reset-form-container">
+                <form id="resetForm">
+                    <div class="form-group">
+                        <label for="newPassword">Password Baru</label>
+                        <input 
+                            type="password" 
+                            id="newPassword" 
+                            name="newPassword" 
+                            placeholder="Masukkan password baru disini"
+                            minlength="8"
+                            required
+                        >
+                        <small class="hint-text">Minimal 8 karakter.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Konfirmasi Password</label>
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            name="confirmPassword" 
+                            placeholder="Konfirmasi password baru disini"
+                            minlength="8"
+                            required
+                        >
+                        <small class="hint-text">Harus sama dengan password baru.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-save">Simpan Password</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="copyright">© 2025 Leafie — All Rights Reserved</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('resetForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if(newPassword.length < 8) {
+                alert('Password minimal 8 karakter!');
+                return;
+            }
+            
+            if(newPassword !== confirmPassword) {
+                alert('Password dan konfirmasi password tidak sama!');
+                return;
+            }
+            
+            alert('Password berhasil diubah!\n(This is a demo)');
+            // Redirect to login page
+            // window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

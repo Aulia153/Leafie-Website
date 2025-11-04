@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Farming Dashboard</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <div class="logo">🌿</div>
+            <div class="logo-text">Login</div>
+        </div>
+        <a href="home.html" class="nav-link">Home</a>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="login-container">
+            <!-- Login Info -->
+            <div class="login-info">
+                <h1>User Login</h1>
+                <p>Silakan masukkan kredensial Anda untuk mengakses dashboard pertanian Anda.</p>
+            </div>
+
+            <!-- Login Form -->
+            <div class="login-form-container">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="Masukkan Username Anda"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Masukkan Password Anda"
+                            required
+                        >
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-forgot">Lupa Password?</button>
+                        <button type="submit" class="btn btn-login">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="copyright">© 2025 Leafie — All Rights Reserved</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if(username && password) {
+                alert('Login successful! (This is a demo)');
+            }
+        });
+
+        document.querySelector('.btn-forgot').addEventListener('click', function() {
+            alert('Password recovery feature (This is a demo)');
+        });
+    </script>
+</body>
+</html>

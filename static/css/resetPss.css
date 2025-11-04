@@ -1,0 +1,253 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #6b7c6e 0%, #5a6b5d 100%);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.logo {
+    width: 35px;
+    height: 35px;
+    background-color: #4a5d4f;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.logo-text {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: opacity 0.3s;
+}
+
+.nav-link:hover {
+    opacity: 0.8;
+}
+
+/* Main Content */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.reset-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1200px;
+    width: 100%;
+    gap: 4rem;
+    align-items: center;
+}
+
+.reset-info {
+    padding: 2rem;
+}
+
+.reset-info h1 {
+    font-size: 3rem;
+    color: #2c3e2f;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.reset-info p {
+    font-size: 1.1rem;
+    color: #5a6b5d;
+    line-height: 1.6;
+}
+
+.reset-form-container {
+    background: white;
+    padding: 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #2c3e2f;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+input[type="password"] {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 2px solid #d4d4ce;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    background-color: #fafaf8;
+}
+
+input[type="password"]:focus {
+    outline: none;
+    border-color: #6b7c6e;
+    background-color: white;
+}
+
+.hint-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #7a8b7d;
+}
+
+.btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #6b7c6e 0%, #5a6b5d 100%);
+    color: white;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(107, 124, 110, 0.3);
+}
+
+/* Footer */
+footer {
+    background-color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e5e5e0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.copyright {
+    color: #5a6b5d;
+    font-size: 0.95rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.footer-links a {
+    color: #2c3e2f;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: #6b7c6e;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+    .reset-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .reset-info {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .reset-info h1 {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    header {
+        padding: 1rem;
+    }
+
+    .logo-text {
+        font-size: 1.2rem;
+    }
+
+    .reset-info h1 {
+        font-size: 2rem;
+    }
+
+    .reset-info p {
+        font-size: 1rem;
+    }
+
+    .reset-form-container {
+        padding: 2rem 1.5rem;
+    }
+
+    footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 1rem;
+    }
+
+    .reset-info h1 {
+        font-size: 1.8rem;
+    }
+
+    .reset-form-container {
+        padding: 1.5rem 1rem;
+    }
+}

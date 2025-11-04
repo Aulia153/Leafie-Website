@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi OTP - Farming Dashboard</title>
+    <link rel="stylesheet" href="/static/css/verifikasiOTP.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <div class="logo">🌿</div>
+            <div class="logo-text">Verifikasi OTP</div>
+        </div>
+        <a href="index.html" class="nav-link">Home</a>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="otp-container">
+            <!-- OTP Info -->
+            <div class="otp-info">
+                <h1>Verifikasi OTP</h1>
+                <p>Masukkan kode OTP yang dikirim ke email Anda:</p>
+            </div>
+
+            <!-- OTP Form -->
+            <div class="otp-form-container">
+                <form id="otpForm">
+                    <div class="form-group">
+                        <label for="otp">Kode OTP</label>
+                        <input 
+                            type="text" 
+                            id="otp" 
+                            name="otp" 
+                            placeholder="Masukkan kode OTP disini"
+                            maxlength="6"
+                            required
+                        >
+                        <small class="hint-text">Kode OTP berlaku selama 5 menit.</small>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-resend">Kirim Ulang</button>
+                        <button type="submit" class="btn btn-verify">Verifikasi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="copyright">© 2025 Leafie — All Rights Reserved</div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('otpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const otp = document.getElementById('otp').value;
+            
+            if(otp && otp.length === 6) {
+                alert('OTP berhasil diverifikasi!\n(This is a demo)');
+                // Redirect to dashboard or next page
+                // window.location.href = 'dashboard.html';
+            } else {
+                alert('Masukkan kode OTP 6 digit yang valid!');
+            }
+        });
+
+        document.querySelector('.btn-resend').addEventListener('click', function() {
+            alert('Kode OTP baru telah dikirim ke email Anda!\n(This is a demo)');
+        });
+    </script>
+</body>
+</html>
