@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Farming Dashboard</title>
     <link rel="stylesheet" href="/static/css/login.css">
 </head>
+
 <body>
     <!-- Header -->
-<header>
-  <div class="logo-section">
-    <div class="logo">
-      <!-- pakai gambar -->
-      <img src="/static/image/logo.png" alt="Logo" id="siteLogo" />
-      <!-- atau, jika ingin emoji, hapus baris <img> di atas dan buka yang di bawah -->
-      <!-- <span>🌿</span> -->
-    </div>
-    <div class="logo-text">Login</div>
-  </div>
-  <a href="index.html" class="nav-link">Home</a>
-</header>
+    <header>
+        <div class="logo-section">
+            <div class="logo">
+                <!-- pakai gambar -->
+                <img src="/static/image/logo.png" alt="Logo" id="siteLogo" />
+                <!-- atau, jika ingin emoji, hapus baris <img> di atas dan buka yang di bawah -->
+                <!-- <span>🌿</span> -->
+            </div>
+            <div class="logo-text">Login</div>
+        </div>
+        <a href="index.html" class="nav-link">Home</a>
+    </header>
 
     <!-- Main Content -->
     <main>
@@ -32,27 +34,16 @@
 
             <!-- Login Form -->
             <div class="login-form-container">
-                <form id="loginForm">
+                <form id="loginForm" method="POST" action="/login">
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username" 
-                            placeholder="Masukkan Username Anda"
-                            required
-                        >
+                        <label for="Email">Email</label>
+                        <input type="text" id="username" name="email" placeholder="Masukkan Email Anda" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            placeholder="Masukkan Password Anda"
-                            required
-                        >
+                        <input type="password" id="password" name="password" placeholder="Masukkan Password Anda"
+                            required>
                     </div>
 
                     <div class="button-group">
@@ -62,6 +53,18 @@
                 </form>
             </div>
         </div>
+
+        <!-- Pesan Login -->
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <p class="{{ category }}">{{ message }}</p>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
     </main>
 
     <!-- Footer -->
@@ -72,21 +75,22 @@
             <a href="#">Contact</a>
         </div>
     </footer>
-
+<!-- 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
-            if(username && password) {
+
+            if (username && password) {
                 alert('Login successful! (This is a demo)');
             }
         });
 
-        document.querySelector('.btn-forgot').addEventListener('click', function() {
+        document.querySelector('.btn-forgot').addEventListener('click', function () {
             alert('Password recovery feature (This is a demo)');
         });
-    </script>
+    </script> -->
 </body>
+
 </html>
