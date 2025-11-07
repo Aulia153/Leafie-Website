@@ -1,0 +1,454 @@
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.header {
+    background-color: #4a5d4a;
+    padding: 15px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.leaf-icon {
+    font-size: 24px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.nav-link:hover {
+    opacity: 0.8;
+}
+
+.nav-link.active {
+    font-weight: 600;
+}
+
+/* Hero Section */
+.hero {
+    background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><rect fill="%23234023" width="1200" height="300"/><circle fill="%23345834" cx="100" cy="100" r="80" opacity="0.3"/><circle fill="%23345834" cx="1100" cy="80" r="100" opacity="0.3"/><circle fill="%23456845" cx="600" cy="150" r="120" opacity="0.2"/></svg>');
+    background-size: cover;
+    background-position: center;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.hero-overlay h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.hero-overlay p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* Main Content */
+.main-content {
+    padding: 40px 0;
+}
+
+.section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Temperature Display */
+.temp-display {
+    background: linear-gradient(135deg, #6a7c6a 0%, #8a9d8a 100%);
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+}
+
+.temp-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.temp-value {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.temp-feels {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+}
+
+.chart-label {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.chart-sublabel {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.chart {
+    width: 100%;
+    height: 200px;
+}
+
+.chart-x-label {
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* Grid Layout */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Humidity Cards */
+.humidity-label {
+    font-size: 14px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.humidity-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+}
+
+.humidity-desc {
+    font-size: 12px;
+    color: white;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.grid-2 .card:first-child {
+    background: linear-gradient(135deg, #6a7c6a 0%, #8a9d8a 100%);
+}
+
+.grid-2 .card:last-child {
+    background: linear-gradient(135deg, #7a8c7a 0%, #9aad9a 100%);
+}
+
+/* Pump Control */
+.pump-control {
+    display: flex;
+    align-items: center;
+}
+
+.btn-pump {
+    width: 100%;
+    padding: 15px;
+    background: #333;
+    color: white;
+    border-color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-pump:hover {
+    background: #5a6d5a;
+}
+
+.pump-status {
+    background: linear-gradient(135deg, #8a9d8a 0%, #aabdaa 100%);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.bulb-icon {
+    font-size: 32px;
+}
+
+.pump-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Upload Buttons */
+.upload-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.btn-upload {
+    padding: 12px 30px;
+    background: white;
+    color: #333;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-upload.active {
+    background: #333;
+    color: white;
+    border-color: #333;
+}
+
+.btn-upload:hover {
+    border-color: #333;
+}
+
+/* Health Status */
+.health-status {
+    background: linear-gradient(135deg, #6a7c6a 0%, #8a9d8a 100%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+}
+
+.status-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.status-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-healthy {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.status-sick {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+/* Leaf Image */
+.leaf-image {
+    background: linear-gradient(135deg, #7a8c7a 0%, #9aad9a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+}
+
+.leaf-img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Activity List */
+.activity-list {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    font-size: 24px;
+    min-width: 30px;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-time {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+.activity-desc {
+    font-size: 13px;
+    color: #666;
+}
+
+/* Download Button */
+.btn-download {
+    padding: 15px 40px;
+    background: #4a5d4a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: block;
+    margin: 0 auto;
+}
+
+.btn-download:hover {
+    background: #5a6d5a;
+}
+
+/* Footer */
+.footer {
+    background: linear-gradient(135deg, #4a5d4a 0%, #5a6d5a 100%);
+    color: white;
+    padding: 30px 0;
+    margin-top: 60px;
+}
+
+.footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer p {
+    font-size: 14px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 30px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: opacity 0.3s;
+}
+
+.footer-links a:hover {
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-overlay h1 {
+        font-size: 28px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+    }
+    
+    .temp-value {
+        font-size: 36px;
+    }
+    
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .upload-buttons {
+        flex-direction: column;
+    }
+    
+    .btn-upload {
+        width: 100%;
+    }
+    
+    .footer .container {
+        flex-direction: column;
+        text-align: center;
+    }
+}
