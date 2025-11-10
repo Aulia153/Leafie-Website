@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Leafie</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/landingPage.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -17,57 +17,60 @@
         <span>Leafie</span>
       </div>
       <nav>
-        <a href="login">Login</a>
+        <a href="login" class="btn-login">Login</a>
       </nav>
     </div>
   </header>
   
   <!-- ===== HERO SECTION ===== -->
-   <section class="hero">
+  <section class="hero">
     <div class="overlay">
       <h1>Leafie</h1>
       <p>
-        Pencegahan kerusakan pada bibit alpukat secara <strong>real-time</strong> dengan 
+        Solusi cerdas pencegahan kerusakan pada bibit alpukat secara <strong>real-time</strong> menggunakan
         teknologi <strong>Internet of Things</strong>.<br>
         Pantau suhu, kelembapan, dan monitoring kesehatan daun langsung dari dashboard — 
-        <em>kapan saja, di mana saja</em>.</p>
-      <a href="#" class="btn">Masuk ke Dashboard Pemantauan</a>
+        <em>kapan saja, di mana saja</em>.
+      </p>
     </div>
   </section>
-
 
   <!-- ===== TENTANG ===== -->
   <section class="about">
     <div class="container">
       <h2>Mengapa Leafie?</h2>
       <p>
-        Leafie hadir sebagai solusi cerdas untuk membantu petani dan peneliti 
-        dalam memantau pertumbuhan bibit alpukat secara real-time. 
-        Dengan teknologi Internet of Things (IoT), semua data tanaman dapat diakses 
-        langsung dari perangkat Anda.
+        Di tengah tantangan pertanian modern, <strong>Leafie</strong> hadir sebagai solusi digital
+        yang menggabungkan teknologi <strong>Internet of Things (IoT)</strong> dengan kemudahan pemantauan berbasis data.
+        Sistem ini membantu petani memantau kondisi bibit alpukat secara <strong>real-time</strong> - mulai dari suhu, kelembapan,
+        hingga kesehatan daun.
       </p>
+      <br><p>Melalui sensor cerdas yang terhubung langsung ke dashboard, Leafie memastikan perubahan pada daun alpukat dapat terdeteksi
+        dengan cepat. Dengan begitu potensi kerusakan bibit bisa dicegah lebih dini, meningkatkan hasil panen dan efisiensi perawatan.
+      </p>
+      <br><p><em>"Tanaman sehat berawal dari pemantauan yang cerdas"</em></p>
     </div>
   </section>
 
-  <!-- ===== FITUR UTAMA ===== -->
+  <!-- ===== FITUR ===== -->
   <section class="features">
     <div class="container">
       <h2>Fitur Utama</h2>
       <div class="grid">
         <div class="card">
-          <img src="{{ url_for('static', filename='image/monitoring.png') }}" alt="">
+          <img src="{{ url_for('static', filename='image/monitoring.jpg') }}" alt="">
           <h3>Monitoring Real-time</h3>
-          <p>Pantau suhu, kelembapan, dan kondisi tanah secara langsung.</p>
+          <p>Pantau suhu, kelembapan, dan kondisi tanah secara langsung dari perangkat Anda.</p>
         </div>
         <div class="card">
-          <img src="{{ url_for('static', filename='image/alert.png') }}" alt="">
+          <img src="{{ url_for('static', filename='image/alert.jpg') }}" alt="">
           <h3>Peringatan Otomatis</h3>
-          <p>Leafie memberi notifikasi saat kondisi tanaman tidak ideal.</p>
+          <p>Leafie memberi notifikasi cepat ketika kondisi tanaman tidak ideal.</p>
         </div>
         <div class="card">
-          <img src="{{ url_for('static', filename='image/statistik.png') }}" alt="">
-          <h3>Statistik Data</h3>
-          <p>Analisis data sensor dalam bentuk grafik untuk membantu pengambilan keputusan.</p>
+          <img src="{{ url_for('static', filename='image/statistik.jpg') }}" alt="">
+          <h3>Analisis & Statistik</h3>
+          <p>Visualisasikan tren data sensor melalui grafik interaktif.</p>
         </div>
       </div>
     </div>
@@ -76,20 +79,21 @@
   <!-- ===== SENSOR ===== -->
   <section class="sensors">
     <div class="container">
-      <h2>Sensor yang Digunakan</h2>
-      <ul>
-        <li>🌡️ Sensor Suhu & Kelembapan (DHT22)</li>
-        <li>💧 Sensor Kelembapan Tanah (Soil Moisture Sensor)</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ===== STATISTIK (DUMMY) ===== -->
-  <section class="stats">
-    <div class="container">
-      <h2>Grafik Pemantauan</h2>
-      <img src="{{ url_for('static', filename='image/chart-demo.png') }}" alt="Grafik Sensor">
-      <p>*Data di atas merupakan contoh tampilan visualisasi sensor Leafie.</p>
+      <h2>Perangkat yang Digunakan</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Sensor DHT22</h3>
+          <p>Mengukur suhu dan kelembapan udara untuk menjaga kestabilan lingkungan tanaman.</p>
+        </div>
+        <div class="card">
+          <h3>Sensor Kelembapan Tanah</h3>
+          <p>Mendeteksi kadar air pada media tanam dan memberi peringatan saat tanah kering.</p>
+        </div>
+        <div class="card">
+          <h3>ESP32</h3>
+          <p>Mikrokontroler utama yang menghubungkan seluruh sensor ke platform Leafie secara real-time.</p>
+        </div>
+      </div>
     </div>
   </section>
 
