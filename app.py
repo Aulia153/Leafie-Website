@@ -8,6 +8,9 @@ from flask import (
     url_for, jsonify, request, g
 )
 from routes.auth_login import auth_bp
+from routes.forgot_password import forgot_bp
+from firebase_config import auth
+
 
 # ==============================
 # 🔹 SETUP DASAR
@@ -18,6 +21,7 @@ DB_PATH = os.path.join(BASE_DIR, "data", "leafie.db")
 app = Flask(__name__)
 app.secret_key = "rahasia_leafie"
 app.register_blueprint(auth_bp)
+app.register_blueprint(forgot_bp)
 
 
 # ==============================

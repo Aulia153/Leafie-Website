@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leafie | Verifikasi OTP</title>
-    <link rel="stylesheet" href="/static/css/verifikasiOTP.css">
+    <title>Verifikasi OTP - Farming Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/verifikasiOTP.css') }}">
 </head>
 <body>
-      <!-- Header -->
-<header>
-  <div class="logo-section">
-    <div class="logo">
-      <!-- pakai gambar -->
-      <img src="/static/image/logo.png" alt="Logo" id="siteLogo" />
-      <!-- atau, jika ingin emoji, hapus baris <img> di atas dan buka yang di bawah -->
-      <!-- <span>🌿</span> -->
-    </div>
-    <div class="logo-text">Verifikasi OTP</div>
-  </div>
-  <a href="/" class="nav-link">Home</a>
-</header>
-
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Logo" id="siteLogo" />
+            </div>
+            <div class="logo-text">Verifikasi OTP</div>
+        </div>
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+    </header>
 
     <!-- Main Content -->
     <main>
@@ -33,14 +29,14 @@
 
             <!-- OTP Form -->
             <div class="otp-form-container">
-                <form id="otpForm">
+                <form id="otpForm" method="POST" action="{{ url_for('forgot_bp.verifikasi_otp') }}">
                     <div class="form-group">
                         <label for="otp">Kode OTP</label>
                         <input 
                             type="text" 
                             id="otp" 
                             name="otp" 
-                            placeholder="Masukkan kode OTP disini"
+                            placeholder="Masukkan kode OTP di sini"
                             maxlength="6"
                             required
                         >
@@ -48,7 +44,7 @@
                     </div>
 
                     <div class="button-group">
-                        <button type="button" class="btn btn-resend">Kirim Ulang</button>
+                        <button type="button" class="btn btn-resend" onclick="resendOTP()">Kirim Ulang</button>
                         <button type="submit" class="btn btn-verify">Verifikasi</button>
                     </div>
                 </form>
@@ -66,21 +62,23 @@
     </footer>
 
     <script>
-        document.getElementById('otpForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const otp = document.getElementById('otp').value;
-            
-            if(otp && otp.length === 6) {
-                alert('OTP berhasil diverifikasi!\n(This is a demo)');
-                // Redirect to dashboard or next page
-                // window.location.href = 'dashboard.html';
+        // Kirim ulang OTP (tanpa reload halaman)
+        async function resendOTP() {
+            const res = await fetch("/resend_otp", { method: "POST" });
+            if (res.ok) {
+                alert("Kode OTP baru telah dikirim ke email Anda!");
             } else {
-                alert('Masukkan kode OTP 6 digit yang valid!');
+                alert("Gagal mengirim ulang OTP. Silakan coba lagi.");
             }
-        });
+        }
 
-        document.querySelector('.btn-resend').addEventListener('click', function() {
-            alert('Kode OTP baru telah dikirim ke email Anda!\n(This is a demo)');
+        // Cek format OTP di sisi frontend sebelum dikirim
+        document.getElementById("otpForm").addEventListener("submit", function(e) {
+            const otp = document.getElementById("otp").value.trim();
+            if (otp.length !== 6 || isNaN(otp)) {
+                e.preventDefault();
+                alert("Masukkan kode OTP 6 digit yang valid!");
+            }
         });
     </script>
 </body>
