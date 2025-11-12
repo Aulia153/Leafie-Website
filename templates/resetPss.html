@@ -3,23 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leafie | Reset Password</title>
-    <link rel="stylesheet" href="/static/css/resetPss.css">
+    <title>Reset Password - Leafie Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resetPss.css') }}">
 </head>
 <body>
-      <!-- Header -->
-<header>
-  <div class="logo-section">
-    <div class="logo">
-      <!-- pakai gambar -->
-      <img src="/static/image/logo.png" alt="Logo" id="siteLogo" />
-      <!-- atau, jika ingin emoji, hapus baris <img> di atas dan buka yang di bawah -->
-      <!-- <span>🌿</span> -->
-    </div>
-    <div class="logo-text">Reset Password</div>
-  </div>
-  <a href="/" class="nav-link">Home</a>
-</header>
+    <!-- Header -->
+    <header>
+        <div class="logo-section">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Logo" id="siteLogo">
+            </div>
+            <div class="logo-text">Reset Password</div>
+        </div>
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+    </header>
 
     <!-- Main Content -->
     <main>
@@ -27,19 +24,19 @@
             <!-- Reset Password Info -->
             <div class="reset-info">
                 <h1>Reset Password</h1>
-                <p>Masukkan password baru:</p>
+                <p>Masukkan password baru untuk akun Anda:</p>
             </div>
 
             <!-- Reset Password Form -->
             <div class="reset-form-container">
-                <form id="resetForm">
+                <form id="resetForm" method="POST" action="{{ url_for('forgot_bp.reset_password') }}">
                     <div class="form-group">
                         <label for="newPassword">Password Baru</label>
                         <input 
                             type="password" 
                             id="newPassword" 
-                            name="newPassword" 
-                            placeholder="Masukkan password baru disini"
+                            name="password" 
+                            placeholder="Masukkan password baru di sini"
                             minlength="8"
                             required
                         >
@@ -52,7 +49,7 @@
                             type="password" 
                             id="confirmPassword" 
                             name="confirmPassword" 
-                            placeholder="Konfirmasi password baru disini"
+                            placeholder="Konfirmasi password baru di sini"
                             minlength="8"
                             required
                         >
@@ -76,24 +73,20 @@
 
     <script>
         document.getElementById('resetForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if(newPassword.length < 8) {
-                alert('Password minimal 8 karakter!');
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+            if (newPassword.length < 8) {
+                e.preventDefault();
+                alert('⚠️ Password minimal 8 karakter!');
                 return;
             }
-            
-            if(newPassword !== confirmPassword) {
-                alert('Password dan konfirmasi password tidak sama!');
+
+            if (newPassword !== confirmPassword) {
+                e.preventDefault();
+                alert('⚠️ Password dan konfirmasi tidak sama!');
                 return;
             }
-            
-            alert('Password berhasil diubah!\n(This is a demo)');
-            // Redirect to login page
-            // window.location.href = 'index.html';
         });
     </script>
 </body>
