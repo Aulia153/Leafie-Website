@@ -9,6 +9,8 @@ from flask import (
 )
 from routes.auth_login import auth_bp
 from routes.forgot_password import forgot_bp
+from firebase_config import auth
+
 
 # ==============================
 # 🔹 SETUP DASAR
