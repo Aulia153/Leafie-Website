@@ -1,251 +1,186 @@
 let tempChart, soilChart;
-let cameraOn = true;
 
-// === Fetch History Data ===
-async function fetchHistory() {
-  const res = await fetch('/api/history?limit=50');
-  return res.json();
-}
+// =====================
+// ELEMENT CACHE
+// =====================
+const el = {
+  tempValue: document.getElementById('tempValue'),
+  timeValue: document.getElementById('timeValue'),
+  soilValue: document.getElementById('soilValue'),
+  soilStatus: document.getElementById('soilStatus'),
+  pumpState: document.getElementById('pumpState'),
+  activityList: document.getElementById('activityList'),
+  leafImg: document.getElementById('leafImage'),
+  btnPump: document.getElementById('pumpBtn'),
+  btnDetect: document.getElementById('detectLeafBtn'),
+  btnCapture: document.getElementById('captureLeafBtn'),
+  leafStatus: document.getElementById('leafHealthStatus')
+};
 
-// === Create Charts ===
+// =====================
+// CHART INIT
+// =====================
 function createCharts() {
-  const tctx = document.getElementById('tempChart').getContext('2d');
-  const sctx = document.getElementById('soilChart').getContext('2d');
+  const chartOptions = {
+    animation: false,
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { labels: { boxWidth: 12 } } }
+  };
 
-  tempChart = new Chart(tctx, {
+  tempChart = new Chart(document.getElementById('tempChart'), {
     type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Suhu (°C)',
-        data: [],
-        borderColor: '#e53935',
-        backgroundColor: 'rgba(229,57,53,0.12)',
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: { animation: false, scales: { y: { beginAtZero: false } } }
+    data: { labels: [], datasets: [{
+      label: 'Suhu (°C)',
+      data: [],
+      borderColor: '#e53935',
+      backgroundColor: 'rgba(229,57,53,0.12)',
+      fill: true,
+      tension: 0.35
+    }]},
+    options: chartOptions
   });
 
-  soilChart = new Chart(sctx, {
+  soilChart = new Chart(document.getElementById('soilChart'), {
     type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Soil Moisture (%)',
-        data: [],
-        borderColor: '#1b5e20',
-        backgroundColor: 'rgba(27,94,32,0.12)',
-        fill: true,
-        tension: 0.3
-      }]
-    },
-    options: { animation: false, scales: { y: { beginAtZero: true, max: 100 } } }
+    data: { labels: [], datasets: [{
+      label: 'Kelembapan Tanah (%)',
+      data: [],
+      borderColor: '#1b5e20',
+      backgroundColor: 'rgba(27,94,32,0.12)',
+      fill: true,
+      tension: 0.35
+    }]},
+    options: {
+      ...chartOptions,
+      scales: { y: { beginAtZero: true, max: 100 } }
+    }
   });
 }
 
+// =====================
+// CHART UPDATE
+// =====================
 function pushToChart(chart, label, value, maxPoints = 30) {
   chart.data.labels.push(label);
   chart.data.datasets[0].data.push(value);
+
   if (chart.data.labels.length > maxPoints) {
     chart.data.labels.shift();
     chart.data.datasets[0].data.shift();
   }
-  chart.update();
+
+  chart.update('none');
 }
 
+// =====================
+// LOG ACTIVITY
+// =====================
 function prependActivity(text) {
-  const list = document.getElementById('activityList');
-  if (!list) return;
   const item = document.createElement('div');
   item.className = 'activity-item';
-  const now = new Date().toLocaleString('id-ID', { hour12: false });
+
+  const timestamp = new Date().toLocaleString('id-ID', { hour12: false });
+
   item.innerHTML = `
     <div class="activity-content">
-      <div class="activity-time">${now}</div>
+      <div class="activity-time">${timestamp}</div>
       <div class="activity-desc">${text}</div>
-    </div>`;
-  list.prepend(item);
+    </div>
+  `;
+
+  el.activityList?.prepend(item);
 }
 
-// === Load Initial Data ===
-async function loadInitial() {
-  createCharts();
-  const history = await fetchHistory();
-  history.forEach(row => {
-    const timePart = (row.timestamp || '').split(' ')[1] || row.timestamp;
-    pushToChart(tempChart, timePart, row.temperature);
-    pushToChart(soilChart, timePart, row.soil_moisture);
-  });
-}
-
-// === Poll Sensor Data ===
+// =====================
+// API → SENSOR POLLING
+// =====================
 async function pollSensor() {
   try {
     const res = await fetch('/api/sensor');
     const data = await res.json();
 
-    document.getElementById('tempValue').textContent = `${data.temperature} °C`;
-    document.getElementById('timeValue').textContent = data.timestamp;
-    document.getElementById('soilValue').textContent = `${data.soil_moisture}%`;
-    const soilStatus = data.soil_moisture > 70 ? 'Basah' : (data.soil_moisture < 50 ? 'Kering' : 'Stabil');
-    document.getElementById('soilStatus').textContent = soilStatus;
+    el.tempValue.textContent = `${data.temperature} °C`;
+    el.timeValue.textContent = data.timestamp || "-";
+    el.soilValue.textContent = `${data.soil}%`;
 
-    const timeLabel = data.timestamp.split(' ')[1];
+    el.soilStatus.textContent =
+      data.soil > 70 ? 'Basah' :
+      data.soil < 50 ? 'Kering' : 'Stabil';
+
+    const timeLabel = data.timestamp?.split(" ")[1] || new Date().toLocaleTimeString('id-ID');
+
     pushToChart(tempChart, timeLabel, data.temperature);
-    pushToChart(soilChart, timeLabel, data.soil_moisture);
+    pushToChart(soilChart, timeLabel, data.soil);
 
-    prependActivity(`Sensor update — T: ${data.temperature}°C, Soil: ${data.soil_moisture}%`);
   } catch (err) {
-    console.error('poll error', err);
+    prependActivity("❗ Sensor error");
   }
 }
 
-// === Toggle Pump ===
+// =====================
+// PUMP TOGGLE
+// =====================
+let pumpLock = false;
+
 async function togglePump() {
-  try {
-    const res = await fetch('/api/pump', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'TOGGLE' })
-    });
-    const j = await res.json();
-    document.getElementById('pumpState').textContent = j.pump;
-    prependActivity(`Pompa diubah menjadi ${j.pump}`);
-  } catch (err) {
-    console.error('pump error', err);
-  }
-}
+  if (pumpLock) return;
+  pumpLock = true;
 
-// === Toggle Camera (utama) ===
-async function toggleCamera() {
-  const cameraFeed = document.getElementById('cameraFeed');
-  const btn = document.getElementById('cameraBtn');
+  el.btnPump.disabled = true;
+  el.btnPump.textContent = "Memproses...";
 
   try {
-    const res = await fetch('/api/camera', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'TOGGLE' })
-    });
-    const j = await res.json();
-
-    if (j.camera === "ON") {
-      cameraFeed.src = "/video_feed";
-      btn.textContent = "Matikan Kamera";
-      prependActivity("Kamera dinyalakan");
-    } else {
-      cameraFeed.src = "/static/image/camera_off.png";
-      btn.textContent = "Nyalakan Kamera";
-      prependActivity("Kamera dimatikan");
-    }
-  } catch (err) {
-    console.error('camera toggle error', err);
-  }
-}
-
-// === Leaf camera ON/OFF (lokal visual toggle) ===
-function toggleLeafCameraVisual() {
-  const leafImg = document.getElementById('leafImage');
-  const btn = document.getElementById('leafCameraBtn');
-  if (!leafImg || !btn) return;
-
-  if (btn.dataset.on === "true") {
-    // === Kamera OFF ===
-    leafImg.classList.add("fade-out");
-    setTimeout(() => {
-      leafImg.src = "/static/image/camera_off.png";
-      leafImg.classList.remove("fade-out");
-      leafImg.classList.add("fade-in");
-    }, 200);
-
-    btn.textContent = "Kamera (OFF)";
-    btn.dataset.on = "false";
-    btn.classList.remove("btn-on");
-    btn.classList.add("btn-off");
-    prependActivity("Kamera daun dimatikan");
-  } else {
-    // === Kamera ON ===
-    leafImg.classList.add("fade-out");
-    setTimeout(() => {
-      leafImg.src = "/static/image/sample_leaf.jpg";
-      leafImg.classList.remove("fade-out");
-      leafImg.classList.add("fade-in");
-    }, 200);
-
-    btn.textContent = "Kamera (ON)";
-    btn.dataset.on = "true";
-    btn.classList.remove("btn-off");
-    btn.classList.add("btn-on");
-    prependActivity("Kamera daun dinyalakan (visual)");
-  }
-
-  // Efek animasi klik tombol
-  btn.classList.add("btn-pressed");
-  setTimeout(() => btn.classList.remove("btn-pressed"), 150);
-}
-
-// === Deteksi Daun ===
-async function detectLeaf() {
-  const btn = document.getElementById("detectLeafBtn");
-  const statusText = document.getElementById("leafHealthStatus");
-  const img = document.getElementById("leafImage");
-
-  if (!btn || !statusText || !img) return;
-
-  btn.disabled = true;
-  btn.textContent = "Mendeteksi...";
-  statusText.textContent = "Mendeteksi daun...";
-
-  try {
-    const res = await fetch("/detect_leaf", { method: "POST" });
+    const res = await fetch('/api/pump', { method: 'POST' });
     const data = await res.json();
 
-    if (data.status) {
-      statusText.textContent = data.status === "Sehat" ? "✅ Sehat" : "❌ Sakit";
-      img.src = data.image_url + "?t=" + new Date().getTime(); // hindari cache
-      prependActivity(`Deteksi daun: ${data.status}`);
-    } else if (data.status === "error") {
-      statusText.textContent = "❌ " + (data.message || "Gagal mendeteksi");
-      prependActivity(`Deteksi daun gagal: ${data.message || ''}`);
-    } else {
-      statusText.textContent = "Gagal mendeteksi daun.";
-    }
-  } catch (err) {
-    console.error(err);
-    statusText.textContent = "Error deteksi daun.";
-    prependActivity("Error saat deteksi daun");
+    el.pumpState.textContent = data.pump;
+    prependActivity(`Pompa diubah menjadi ${data.pump}`);
+
+  } catch {
+    prependActivity("❗ Error mengubah status pompa");
   }
 
-  btn.disabled = false;
-  btn.textContent = "Deteksi Daun";
+  el.btnPump.disabled = false;
+  el.btnPump.textContent = "Ubah Pompa";
+  pumpLock = false;
 }
 
-// === Init ===
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadInitial();
-  await pollSensor();
+// =====================
+// LEAF CAPTURE
+// =====================
+async function captureLeaf() {
+  try {
+    const res = await fetch('/capture_leaf', { method: 'POST' });
+    const data = await res.json();
+
+    if (data.success) {
+      el.leafImg.src = `${data.path}?t=${Date.now()}`;
+      prependActivity("Foto daun berhasil diambil");
+    } else {
+      prependActivity("❗ Capture gagal");
+    }
+  } catch {
+    prependActivity("❗ Error capture daun");
+  }
+}
+
+// =====================
+// LEAF DETECTION (DISABLED, ROUTE BELUM ADA)
+// =====================
+async function detectLeaf() {
+  alert("Fitur deteksi daun belum diaktifkan. Tambahkan route /detect_leaf di backend.");
+}
+
+// =====================
+// INIT
+// =====================
+document.addEventListener('DOMContentLoaded', () => {
+  createCharts();
+  pollSensor();
   setInterval(pollSensor, 5000);
 
-  const pumpBtn = document.getElementById('pumpBtn');
-  if (pumpBtn) pumpBtn.addEventListener('click', togglePump);
-
-  const cameraBtn = document.getElementById('cameraBtn');
-  if (cameraBtn) cameraBtn.addEventListener('click', toggleCamera);
-
-  const leafCameraBtn = document.getElementById('leafCameraBtn');
-  if (leafCameraBtn) {
-    // set initial data-on attribute
-    leafCameraBtn.dataset.on = "true";
-    leafCameraBtn.addEventListener('click', toggleLeafCameraVisual);
-  }
-
-  const detectLeafBtn = document.getElementById('detectLeafBtn');
-  if (detectLeafBtn) detectLeafBtn.addEventListener('click', detectLeaf);
-
-  const exportBtn = document.getElementById('exportBtn');
-  if (exportBtn) exportBtn.addEventListener('click', () => {
-    window.location = '/api/export';
-  });
+  el.btnPump?.addEventListener('click', togglePump);
+  el.btnDetect?.addEventListener('click', detectLeaf);
+  el.btnCapture?.addEventListener('click', captureLeaf);
 });
