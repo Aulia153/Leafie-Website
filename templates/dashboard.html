@@ -95,7 +95,7 @@
       <div class="grid-2">
         <div class="card camera-card">
           <img id="cameraFeed"
-               src="{{ url_for('video_feed') }}"
+               src="{{ esp32_stream_url }}"
                alt="Live Camera"
                class="camera-frame"
                onerror="this.src='/static/image/default_leaf.jpg'">

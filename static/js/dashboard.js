@@ -14,8 +14,15 @@ const el = {
   btnPump: document.getElementById('pumpBtn'),
   btnDetect: document.getElementById('detectLeafBtn'),
   btnCapture: document.getElementById('captureLeafBtn'),
-  leafStatus: document.getElementById('leafHealthStatus')
+  leafStatus: document.getElementById('leafHealthStatus'),
+  cameraBtn: document.getElementById('cameraBtn'),
+  exportBtn: document.getElementById('exportBtn')
 };
+
+// Set default leaf image if empty
+if (el.leafImg && !el.leafImg.src) {
+  el.leafImg.src = '/static/image/leaf_latest.jpg';
+}
 
 // =====================
 // CHART INIT
@@ -102,16 +109,16 @@ async function pollSensor() {
 
     el.tempValue.textContent = `${data.temperature} °C`;
     el.timeValue.textContent = data.timestamp || "-";
-    el.soilValue.textContent = `${data.soil}%`;
+    el.soilValue.textContent = `${data.soil_moisture}%`;
 
     el.soilStatus.textContent =
-      data.soil > 70 ? 'Basah' :
-      data.soil < 50 ? 'Kering' : 'Stabil';
+      data.soil_moisture > 70 ? 'Basah' :
+      data.soil_moisture < 50 ? 'Kering' : 'Stabil';
 
     const timeLabel = data.timestamp?.split(" ")[1] || new Date().toLocaleTimeString('id-ID');
 
     pushToChart(tempChart, timeLabel, data.temperature);
-    pushToChart(soilChart, timeLabel, data.soil);
+    pushToChart(soilChart, timeLabel, data.soil_moisture);
 
   } catch (err) {
     prependActivity("❗ Sensor error");
@@ -142,8 +149,25 @@ async function togglePump() {
   }
 
   el.btnPump.disabled = false;
-  el.btnPump.textContent = "Ubah Pompa";
+  el.btnPump.textContent = "Toggle Pompa";
   pumpLock = false;
+}
+
+// =====================
+// CAMERA TOGGLE
+// =====================
+async function toggleCamera() {
+  try {
+    const res = await fetch('/api/camera', { method: 'POST' });
+    const data = await res.json();
+    // update button text
+    if (el.cameraBtn) {
+      el.cameraBtn.textContent = data.camera === "ON" ? "Matikan Kamera" : "Nyalakan Kamera";
+    }
+    prependActivity(`Kamera diubah menjadi ${data.camera}`);
+  } catch (err) {
+    prependActivity("❗ Error mengubah status kamera");
+  }
 }
 
 // =====================
@@ -157,6 +181,8 @@ async function captureLeaf() {
     if (data.success) {
       el.leafImg.src = `${data.path}?t=${Date.now()}`;
       prependActivity("Foto daun berhasil diambil");
+      // langsung deteksi otomatis setelah capture
+      await detectLeaf(); 
     } else {
       prependActivity("❗ Capture gagal");
     }
@@ -166,10 +192,84 @@ async function captureLeaf() {
 }
 
 // =====================
-// LEAF DETECTION (DISABLED, ROUTE BELUM ADA)
+// LEAF DETECTION
 // =====================
 async function detectLeaf() {
-  alert("Fitur deteksi daun belum diaktifkan. Tambahkan route /detect_leaf di backend.");
+  try {
+    el.leafStatus.textContent = "Mendeteksi...";
+    el.leafStatus.classList.remove("healthy", "unhealthy");
+
+    const res = await fetch('/api/detect_leaf', {
+      method: 'POST'
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      el.leafStatus.textContent = "Deteksi gagal — " + (data.message || "");
+      el.leafStatus.classList.add("unhealthy");
+      prependActivity("❗ Gagal deteksi daun");
+      return;
+    }
+
+    // Update foto daun terbaru
+    if (data.image) {
+      el.leafImg.src = data.image + "?t=" + Date.now();
+    }
+
+    // Tampilkan hasil deteksi
+    el.leafStatus.textContent = data.result + " — " + data.message;
+
+    // Jika daun sehat
+    if (data.status === "HEALTHY") {
+      el.leafStatus.classList.remove("unhealthy");
+      el.leafStatus.classList.add("healthy");
+      prependActivity(`Hasil deteksi: SEHAT — ${data.result}`);
+    }
+
+    // Jika daun tidak sehat
+    else {
+      el.leafStatus.classList.remove("healthy");
+      el.leafStatus.classList.add("unhealthy");
+
+      prependActivity(`Hasil deteksi: TIDAK SEHAT — ${data.result}`);
+
+      // 🔴 Peringatan dini
+      alert("⚠️ Daun terdeteksi tidak sehat, segera lakukan pengecekan!");
+    }
+
+  } catch (err) {
+    console.error("Error detectLeaf:", err);
+    el.leafStatus.textContent = "Error deteksi";
+    el.leafStatus.classList.add("unhealthy");
+    prependActivity("❗ Error saat deteksi daun");
+  }
+}
+
+
+// =====================
+// EXPORT CSV (download history readings)
+// =====================
+async function exportCSV() {
+  try {
+    const res = await fetch('/export_csv');
+    if (!res.ok) {
+      prependActivity("❗ Gagal export CSV");
+      return;
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `readings_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    prependActivity("Export CSV berhasil");
+  } catch (err) {
+    prependActivity("❗ Error export CSV");
+  }
 }
 
 // =====================
@@ -183,4 +283,11 @@ document.addEventListener('DOMContentLoaded', () => {
   el.btnPump?.addEventListener('click', togglePump);
   el.btnDetect?.addEventListener('click', detectLeaf);
   el.btnCapture?.addEventListener('click', captureLeaf);
+  el.cameraBtn?.addEventListener('click', toggleCamera);
+  el.exportBtn?.addEventListener('click', exportCSV);
+
+  // set initial camera btn text based on pumpState element if available
+  if (el.cameraBtn && document.getElementById('pumpState')) {
+    // no-op; server will control actual state. You may populate camera button text on page render.
+  }
 });

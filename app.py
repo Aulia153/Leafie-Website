@@ -1,8 +1,9 @@
 import os
 import random
-import requests
+import requests , csv
 from datetime import datetime
-from flask import Flask, render_template, session, redirect, url_for, jsonify, request
+from io import StringIO
+from flask import Flask, render_template, session, redirect, url_for, jsonify, request , Response
 
 from firebase_config import db
 
@@ -23,7 +24,7 @@ STATIC_IMG_DIR = os.path.join(BASE_DIR, "static", "image")
 os.makedirs(STATIC_IMG_DIR, exist_ok=True)
 
 # ==== ESP32 CONFIG ====
-ESP32_IP = "192.168.1.50"
+ESP32_IP = "192.168.100.201"
 ESP32_STREAM_URL = f"http://{ESP32_IP}:81/stream"
 ESP32_CAPTURE_URL = f"http://{ESP32_IP}/capture"
 
@@ -149,6 +150,91 @@ def api_camera():
     add_activity(f"Kamera diubah menjadi {new}")
     return jsonify({"camera": new})
 
+@app.route("/api/detect_leaf", methods=["POST"])
+def detect_leaf():
+    latest_img_path = os.path.join(STATIC_IMG_DIR, "leaf_latest.jpg")
+
+    if not os.path.exists(latest_img_path):
+        return jsonify({
+            "success": False,
+            "message": "Foto daun belum tersedia. Ambil foto dulu."
+        }), 400
+
+    # --- AI DETEKSI DUMMY ---
+    kondisi_tidak_sehat = [
+        "Daun Menguning — indikasi kekurangan nitrogen.",
+        "Terdeteksi Bercak Coklat — potensi jamur.",
+        "Daun Layu — kekurangan air.",
+        "Daun Menghitam — terlalu banyak cahaya matahari."
+    ]
+
+    kondisi_sehat = [
+        "Daun Sehat — tidak ditemukan gejala penyakit."
+    ]
+
+    # Random detection
+    is_healthy = random.choice([True, False])
+
+    if is_healthy:
+        result = random.choice(kondisi_sehat)
+        message = random.choice([
+            "Daun tampak sehat! Pertahankan perawatan terbaikmu 🌿",
+        ])
+        status = "HEALTHY"
+    else:
+        result = random.choice(kondisi_tidak_sehat)
+        message = "⚠️ Daun terdeteksi tidak sehat, segera lakukan pengecekan!"
+        status = "UNHEALTHY"
+
+    # Simpan aktivitas ke Firebase
+    add_activity(f"Hasil deteksi daun: {result}")
+
+    return jsonify({
+        "success": True,
+        "status": status,
+        "result": result,
+        "message": message,
+        "image": "/static/image/leaf_latest.jpg"
+    })
+
+@app.route("/export_csv")
+def export_csv():
+    try:
+        # ambil semua sensor readings
+        data = db.child("readings").get().val()
+
+        if not data:
+            return Response("No data available", status=404)
+
+        # buffer CSV
+        output = StringIO()
+        writer = csv.writer(output)
+
+        # header CSV
+        writer.writerow(["temperature", "humidity", "soil_moisture", "timestamp"])
+
+        # isi data
+        for key, item in data.items():
+            writer.writerow([
+                item.get("temperature", ""),
+                item.get("humidity", ""),
+                item.get("soil_moisture", ""),
+                item.get("timestamp", "")
+            ])
+
+        # buat respon file
+        response = Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={
+                "Content-Disposition": "attachment; filename=readings.csv"
+            }
+        )
+        return response
+
+    except Exception as e:
+        print("CSV Export Error:", e)
+        return Response("Error exporting CSV", status=500)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

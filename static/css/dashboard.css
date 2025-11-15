@@ -271,6 +271,26 @@ canvas {
   gap: 16px;
 }
 
+.status-text {
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.status-text.healthy {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16,185,129,0.18);
+}
+
+.status-text.unhealthy {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  border: 1px solid rgba(239,68,68,0.12);
+}
+
+
 /* Laptop: foto & status berdampingan */
 @media (min-width: 900px) {
   .leaf-result .grid-2 {
