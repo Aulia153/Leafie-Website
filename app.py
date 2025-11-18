@@ -68,27 +68,18 @@ def dashboard():
     if "user" not in session:
         return redirect(url_for("auth_bp.login"))
 
-    # generate dummy reading and simpan (sama dengan behavior sebelumnya)
-    reading = generate_reading()
-    try:
-        db.child("readings").push(reading)
-    except Exception as e:
-        # jangan crash bila koneksi firebase bermasalah
-        print("Warning: gagal push reading ke Firebase:", e)
+    # ambil sensor palsu sekali saja (untuk awal load)
+    reading = None
 
-    # ambil activity terakhir (urut berdasarkan time)
-    activity_data = {}
+    # ambil activity dari firebase
     try:
-        # ambil semua lalu sortir berdasarkan time (string 'YYYY-MM-DD HH:MM:SS' -> lexicographic works)
         raw = db.child("activity").get().val()
         if raw:
-            # raw is dict {id: {time:..., desc:...}, ...}
             items = sorted(raw.items(), key=lambda kv: kv[1].get("time", ""))
-            activity_list = [v for k, v in items]  # list of {time, desc}
+            activity_list = [v for k, v in items]
         else:
             activity_list = []
-    except Exception as e:
-        print("Warning: gagal baca activity dari Firebase:", e)
+    except:
         activity_list = []
 
     return render_template(
@@ -101,16 +92,40 @@ def dashboard():
     )
 
 
+# ==== GLOBAL LAST SENSOR STATE ====
+last_temp = None
+last_soil = None
+
 @app.route("/api/sensor")
 def api_sensor():
+    global last_temp, last_soil
+
+    # ambil data sensor
     reading = generate_reading()
+    temperature = reading["temperature"]
+    soil = reading["soil_moisture"]
+
     try:
+        # simpan reading ke firebase
         db.child("readings").push(reading)
+
+        # ========== LOGGING KONDISI BERUBAH ==========
+        if last_temp != temperature or last_soil != soil:
+            add_activity(
+                f"Sensor berubah → Suhu: {temperature}°C, Kelembapan Tanah: {soil}%"
+            )
+
+        # update nilai terakhir
+        last_temp = temperature
+        last_soil = soil
+
     except Exception as e:
         print("Warning: gagal push reading ke Firebase:", e)
 
+    # tambahkan state
     reading["pump"] = get_state("pump")
     reading["camera"] = get_state("camera")
+
     return jsonify(reading)
 
 
@@ -126,16 +141,24 @@ def api_pump():
 @app.route("/capture_leaf", methods=["POST"])
 def capture_leaf():
     try:
+        # ambil gambar dari ESP32
         resp = requests.get(ESP32_CAPTURE_URL, timeout=5)
         if resp.status_code != 200:
             return jsonify({"success": False}), 500
 
+        # simpan ke file
         path = os.path.join(STATIC_IMG_DIR, "leaf_latest.jpg")
         with open(path, "wb") as f:
             f.write(resp.content)
 
+        # catat aktivitas di Firebase
         add_activity("Gambar daun berhasil diambil")
-        return jsonify({"success": True, "path": "/static/image/leaf_latest.jpg"})
+
+        return jsonify({
+            "success": True,
+            "path": "/static/image/leaf_latest.jpg"
+        })
+
     except Exception as e:
         print("Error capture:", e)
         return jsonify({"success": False}), 500
@@ -196,6 +219,7 @@ def detect_leaf():
         "message": message,
         "image": "/static/image/leaf_latest.jpg"
     })
+
 
 @app.route("/export_csv")
 def export_csv():

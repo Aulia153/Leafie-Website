@@ -53,15 +53,14 @@ header {
   color: #ffffff;
   text-decoration: none;
   font-size: 1rem;
-  padding: 0.6rem 1.2rem;
-  border: 2px solid #ffffff;
-  border-radius: 50px;
+  padding: 0;
+  border: none !important;
+  border-radius: 0;
   transition: all 0.3s ease;
 }
 
 .nav-link:hover {
-  background-color: #ffffff;
-  color: #1b5e20;
+  color: #ffff;
   font-weight: 600;
 }
 
