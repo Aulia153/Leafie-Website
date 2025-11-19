@@ -42,4 +42,4 @@ def login():
 def logout():
     session.clear()  # jauh lebih aman
     flash('🚪 Anda telah logout.', 'info')
-    return redirect(url_for('auth_bp.login'))
+    return redirect(url_for('home'))

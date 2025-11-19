@@ -5,6 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leafie — Dashboard</title>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
@@ -15,9 +16,12 @@
   <header class="header">
     <div class="container nav">
       <div class="logo">
-        <img src="{{ url_for('static', filename='image/logo.png') }}" alt="logo" onerror="this.src='/static/image/logo.png'">
+        <img src="{{ url_for('static', filename='image/logo.png') }}"
+             alt="logo"
+             onerror="this.src='/static/image/logo.png'">
         <span>Leafie</span>
       </div>
+
       <div class="nav-links">
         <a href="{{ url_for('auth_bp.logout') }}" class="nav-link">Logout</a>
       </div>
@@ -116,26 +120,22 @@
       <h2 class="section-title">Monitoring Kesehatan Daun</h2>
       <p class="section-subtitle">Foto daun terbaru akan muncul setelah diambil dari kamera</p>
 
-      <div class="grid-2">
-        <div class="card leaf-control">
-          <button id="detectLeafBtn" class="btn">Deteksi Daun</button>
-        </div>
+      <div class="card leaf-result">
+        <div class="grid-2">
 
-        <div class="card leaf-result">
-          <div class="grid-2">
-            <div class="leaf-status">
-              <h4>Hasil Deteksi</h4>
-              <p id="leafHealthStatus" class="status-text">Menunggu hasil...</p>
-            </div>
-
-            <div class="leaf-photo">
-              <h4>Foto Daun Terbaru</h4>
-              <img id="leafImage"
-                   alt="Daun terbaru"
-                   class="leaf-img"
-                   onerror="this.src='/static/image/default_leaf.jpg'">
-            </div>
+          <div class="leaf-status">
+            <h4>Hasil Deteksi</h4>
+            <p id="leafHealthStatus" class="status-text">Menunggu hasil...</p>
           </div>
+
+          <div class="leaf-photo">
+            <h4>Foto Daun Terbaru</h4>
+            <img id="leafImage"
+                 alt="Daun terbaru"
+                 class="leaf-img"
+                 onerror="this.src='/static/image/default_leaf.jpg'">
+          </div>
+
         </div>
       </div>
     </section>
@@ -144,9 +144,16 @@
     <section class="section">
       <h2 class="section-title">Catatan Aktivitas</h2>
 
+      <div class="activity-filter">
+        <button class="filter-btn active" data-filter="all">Semua</button>
+        <button class="filter-btn" data-filter="sensor">Sensor</button>
+        <button class="filter-btn" data-filter="camera">Kamera</button>
+        <button class="filter-btn" data-filter="pump">Pompa</button>
+      </div>
+
       <div id="activityList" class="activity-list card">
         {% for log in activity %}
-        <div class="activity-item">
+        <div class="activity-item" data-type="{{ log.type | default('general') }}">
           <div class="activity-content">
             <div class="activity-time">{{ log.time }}</div>
             <div class="activity-desc">{{ log.desc }}</div>
@@ -163,6 +170,7 @@
 
   </main>
 
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
       <p>© 2025 Leafie — All Rights Reserved</p>

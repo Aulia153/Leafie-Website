@@ -1,6 +1,6 @@
-/* =======================================
+/* =======================================================
    RESET & BASE
-======================================= */
+======================================================= */
 * {
   margin: 0;
   padding: 0;
@@ -26,9 +26,9 @@ img {
   margin: auto;
 }
 
-/* =======================================
+/* =======================================================
    HEADER
-======================================= */
+======================================================= */
 .header {
   background: #1b5e20;
   padding: 14px 0;
@@ -66,23 +66,23 @@ img {
 }
 
 .nav-link {
-  color: white;
+  color: #fff;
   text-decoration: none;
   font-size: 0.92rem;
-  transition: opacity .3s;
+  transition: opacity 0.3s;
 }
 
 .nav-link:hover {
-  opacity: .7;
+  opacity: 0.7;
 }
 
-/* =======================================
+/* =======================================================
    HERO
-======================================= */
+======================================================= */
 .hero {
   padding: 55px 15px;
   text-align: center;
-  color: white;
+  color: #fff;
   background: linear-gradient(rgba(27,94,32,0.85), rgba(27,94,32,0.85)),
               url("https://images.unsplash.com/photo-1615485737654-8b7b9a52d8a0") center/cover;
   border-bottom-left-radius: 22px;
@@ -100,9 +100,9 @@ img {
   margin-top: 6px;
 }
 
-/* =======================================
-   MAIN LAYOUT
-======================================= */
+/* =======================================================
+   LAYOUT & SECTIONS
+======================================================= */
 .main-content {
   padding: 40px 0;
 }
@@ -112,8 +112,8 @@ img {
 }
 
 .section-title {
-  color: #1b5e20;
   text-align: center;
+  color: #1b5e20;
   font-size: 1.35rem;
   font-weight: 600;
   margin-bottom: 6px;
@@ -122,56 +122,52 @@ img {
 .section-subtitle {
   text-align: center;
   color: #444;
-  margin-bottom: 26px;
   font-size: 0.85rem;
+  margin-bottom: 26px;
 }
 
-/* =======================================
-   GRID SYSTEM
-======================================= */
-
-/* HP - Default satu kolom */
+/* =======================================================
+   GRID
+======================================================= */
 .grid-2 {
   display: grid;
   gap: 20px;
 }
 
-/* Laptop 900px ke atas baru 2 kolom */
 @media (min-width: 900px) {
   .grid-2 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* =======================================
-   CARD
-======================================= */
+/* =======================================================
+   CARD GENERAL
+======================================================= */
 .card {
   background: #fff;
   padding: 20px;
   border-radius: 14px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  transition: .25s ease;
+  transition: 0.25s ease;
 }
 
 .card:hover {
   transform: translateY(-3px);
 }
 
-/* =======================================
-   TEMP CARD
-======================================= */
+/* =======================================================
+   TEMPERATURE CARD
+======================================================= */
 .temp-display {
-  background: linear-gradient(135deg,#1b5e20,#336e2f);
+  background: linear-gradient(135deg, #1b5e20, #336e2f);
   padding: 28px;
-  color: white;
   text-align: center;
-  border-radius: 14px;
+  color: #fff;
 }
 
 .temp-label {
+  opacity: 0.9;
   font-size: 0.95rem;
-  opacity: .9;
 }
 
 .temp-value {
@@ -181,20 +177,19 @@ img {
 }
 
 .temp-feels {
-  margin-top: 8px;
   font-size: 0.85rem;
   opacity: 0.85;
+  margin-top: 8px;
 }
 
-/* =======================================
+/* =======================================================
    HUMIDITY CARD
-======================================= */
+======================================================= */
 .humidity-card {
-  background: linear-gradient(135deg,#2e7d32,#4caf50);
-  color: white;
-  text-align: center;
+  background: linear-gradient(135deg, #2e7d32, #4caf50);
   padding: 25px;
-  border-radius: 14px;
+  text-align: center;
+  color: #fff;
 }
 
 .humidity-value {
@@ -203,20 +198,19 @@ img {
   margin-top: 6px;
 }
 
-/* =======================================
-   CHART FIX (Responsif)
-======================================= */
+/* =======================================================
+   CHART RESPONSIVE
+======================================================= */
 canvas {
   width: 100% !important;
   height: auto !important;
 }
 
-/* =======================================
+/* =======================================================
    CAMERA
-======================================= */
+======================================================= */
 .camera-frame {
   width: 100%;
-  height: auto;
   max-height: 260px;
   border-radius: 12px;
   object-fit: cover;
@@ -228,18 +222,18 @@ canvas {
   gap: 14px;
 }
 
-/* =======================================
+/* =======================================================
    BUTTONS
-======================================= */
+======================================================= */
 .btn {
   padding: 11px 22px;
-  border-radius: 10px;
   border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
+  border-radius: 10px;
   background: #1b5e20;
-  color: white;
-  transition: .2s;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .btn:hover {
@@ -254,17 +248,17 @@ canvas {
 
 .btn-outline:hover {
   background: #1b5e20;
-  color: white;
+  color: #fff;
 }
 
-/* =======================================
+/* =======================================================
    LEAF RESULT
-======================================= */
+======================================================= */
 .leaf-result {
   background: #5e705f;
   padding: 18px;
   border-radius: 14px;
-  color: white;
+  color: #fff;
 }
 
 .leaf-result .grid-2 {
@@ -272,43 +266,41 @@ canvas {
 }
 
 .status-text {
-  font-weight: 600;
-  padding: 8px 12px;
-  border-radius: 8px;
   display: inline-block;
+  padding: 8px 12px;
+  font-weight: 600;
+  border-radius: 8px;
 }
 
 .status-text.healthy {
-  background: rgba(16, 185, 129, 0.12);
+  background: rgba(16,185,129,0.12);
   color: #059669;
   border: 1px solid rgba(16,185,129,0.18);
 }
 
 .status-text.unhealthy {
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239,68,68,0.08);
   color: #dc2626;
   border: 1px solid rgba(239,68,68,0.12);
 }
 
+.leaf-img {
+  width: 100%;
+  max-height: 220px;
+  margin-top: 12px;
+  border-radius: 12px;
+  object-fit: cover;
+}
 
-/* Laptop: foto & status berdampingan */
 @media (min-width: 900px) {
   .leaf-result .grid-2 {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-.leaf-img {
-  width: 100%;
-  border-radius: 12px;
-  margin-top: 12px;
-  max-height: 220px;
-  object-fit: cover;
-}
-
-/* =======================================
+/* =======================================================
    ACTIVITY LIST
-======================================= */
+======================================================= */
 .activity-list {
   border-radius: 12px;
   overflow: hidden;
@@ -324,20 +316,48 @@ canvas {
 }
 
 .activity-time {
-  color: #666;
   font-size: 0.8rem;
+  color: #666;
 }
 
 .activity-desc {
   font-size: 0.9rem;
 }
 
-/* =======================================
+/* Filter Buttons */
+.activity-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #1b5e20;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.filter-btn:hover {
+  background: #43a047;
+}
+
+.filter-btn.active {
+  background: #2e7d32;
+  font-weight: 600;
+}
+
+/* =======================================================
    FOOTER
-======================================= */
+======================================================= */
 .footer {
   background: #1b5e20;
-  color: white;
+  color: #fff;
   text-align: center;
   padding: 26px 15px;
   font-size: 0.92rem;
@@ -345,9 +365,9 @@ canvas {
   border-top-right-radius: 18px;
 }
 
-/* =======================================
-   RESPONSIVE — SMALL PHONES
-======================================= */
+/* =======================================================
+   RESPONSIVE (MOBILE < 480px)
+======================================================= */
 @media (max-width: 480px) {
   .hero h1 {
     font-size: 1.55rem;

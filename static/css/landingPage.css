@@ -59,22 +59,6 @@ body {
   text-decoration: underline;
 }
 
-/* Tombol login */
-.btn-login {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 8px 18px;
-  border: 1.5px solid white;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-}
-
-.btn-login:hover {
-  background: white;
-  color: #1b5e20;
-}
-
 /* ===== HERO SECTION ===== */
 .hero {
   background: url("../image/background.jpg") center/cover no-repeat;

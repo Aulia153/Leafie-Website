@@ -1,11 +1,12 @@
 import os
 import random
-import requests , csv
+import requests
+import csv
 from datetime import datetime
 from io import StringIO
-from flask import Flask, render_template, session, redirect, url_for, jsonify, request , Response
+from flask import Flask, render_template, session, redirect, url_for, jsonify, request, Response
 
-from firebase_config import db
+from firebase_config import db   # <-- pastikan ini adalah client Realtime Database (pyrebase/etc.)
 
 # ==== FLASK ====
 app = Flask(__name__)
@@ -28,23 +29,31 @@ ESP32_IP = "192.168.100.201"
 ESP32_STREAM_URL = f"http://{ESP32_IP}:81/stream"
 ESP32_CAPTURE_URL = f"http://{ESP32_IP}/capture"
 
-# ==== FIREBASE HELPERS ====
+# ==== FIREBASE HELPERS (Realtime DB) ====
 def get_state(key):
-    res = db.child("settings").child(key).get().val()
-    return res if res else "OFF"
+    try:
+        res = db.child("settings").child(key).get().val()
+        return res if res is not None else "OFF"
+    except Exception:
+        return "OFF"
 
 def set_state(key, value):
     db.child("settings").child(key).set(value)
 
-def add_activity(msg):
+def add_activity(message, type="general"):
     """
-    Simpan activity dengan keys: time, desc
-    Template mengakses log.time dan log.desc
+    Simpan activity ke Realtime DB dengan fields: time, desc, type
     """
-    db.child("activity").push({
+    payload = {
         "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "desc": msg
-    })
+        "desc": message,
+        "type": type
+    }
+    try:
+        db.child("activity").push(payload)
+    except Exception as e:
+        print("Warning: gagal push activity ke Firebase:", e)
+
 
 # def generate_reading():
 #     """
@@ -110,6 +119,9 @@ def dashboard():
         esp32_stream_url=ESP32_STREAM_URL
     )
 
+# ==== GLOBAL LAST SENSOR STATE ====
+last_temp = None
+last_soil = None
 
 @app.route("/api/sensor")
 def api_sensor():
@@ -131,6 +143,7 @@ def api_sensor():
     reading.setdefault("soil_moisture", 0)
     reading.setdefault("timestamp", "")
 
+    # tambahkan state
     reading["pump"] = get_state("pump")
     reading["camera"] = get_state("camera")
 
@@ -144,36 +157,44 @@ def api_pump():
     current = get_state("pump")
     new = "OFF" if current == "ON" else "ON"
     set_state("pump", new)
-    add_activity(f"Pompa diubah menjadi {new}")
+    add_activity(f"Pompa diubah menjadi {new}", type="pump")
     return jsonify({"pump": new})
 
 
 @app.route("/capture_leaf", methods=["POST"])
 def capture_leaf():
     try:
+        # ambil gambar dari ESP32
         resp = requests.get(ESP32_CAPTURE_URL, timeout=5)
         if resp.status_code != 200:
             return jsonify({"success": False}), 500
 
+        # simpan ke file
         path = os.path.join(STATIC_IMG_DIR, "leaf_latest.jpg")
         with open(path, "wb") as f:
             f.write(resp.content)
 
-        add_activity("Gambar daun berhasil diambil")
-        return jsonify({"success": True, "path": "/static/image/leaf_latest.jpg"})
+        # catat aktivitas di Firebase (camera/capture)
+        add_activity("Gambar daun berhasil diambil", type="camera")
+
+        return jsonify({
+            "success": True,
+            "path": "/static/image/leaf_latest.jpg"
+        })
+
     except Exception as e:
         print("Error capture:", e)
         return jsonify({"success": False}), 500
 
 
-# Tambahan kecil: route untuk mengubah camera state (opsional)
 @app.route("/api/camera", methods=["POST"])
 def api_camera():
     current = get_state("camera")
     new = "OFF" if current == "ON" else "ON"
     set_state("camera", new)
-    add_activity(f"Kamera diubah menjadi {new}")
+    add_activity(f"Kamera diubah menjadi {new}", type="camera")
     return jsonify({"camera": new})
+
 
 @app.route("/api/detect_leaf", methods=["POST"])
 def detect_leaf():
@@ -202,17 +223,15 @@ def detect_leaf():
 
     if is_healthy:
         result = random.choice(kondisi_sehat)
-        message = random.choice([
-            "Daun tampak sehat! Pertahankan perawatan terbaikmu 🌿",
-        ])
+        message = "Daun tampak sehat! Pertahankan perawatan terbaikmu 🌿"
         status = "HEALTHY"
     else:
         result = random.choice(kondisi_tidak_sehat)
         message = "⚠️ Daun terdeteksi tidak sehat, segera lakukan pengecekan!"
         status = "UNHEALTHY"
 
-    # Simpan aktivitas ke Firebase
-    add_activity(f"Hasil deteksi daun: {result}")
+    # Simpan aktivitas ke Firebase (type leaf)
+    add_activity(f"Hasil deteksi daun: {result}", type="leaf")
 
     return jsonify({
         "success": True,
@@ -222,29 +241,29 @@ def detect_leaf():
         "image": "/static/image/leaf_latest.jpg"
     })
 
+
 @app.route("/export_csv")
 def export_csv():
     try:
-        # ambil semua sensor readings
-        data = db.child("readings").get().val()
+        # ambil semua activity dari realtime db
+        data = db.child("activity").get().val()
 
         if not data:
-            return Response("No data available", status=404)
+            return Response("No activity data available", status=404)
 
         # buffer CSV
         output = StringIO()
         writer = csv.writer(output)
 
-        # header CSV
-        writer.writerow(["temperature", "humidity", "soil_moisture", "timestamp"])
+        # header CSV (include type)
+        writer.writerow(["time", "type", "description"])
 
-        # isi data
+        # isi data activity
         for key, item in data.items():
             writer.writerow([
-                item.get("temperature", ""),
-                item.get("humidity", ""),
-                item.get("soil_moisture", ""),
-                item.get("timestamp", "")
+                item.get("time", ""),
+                item.get("type", ""),
+                item.get("desc", "")
             ])
 
         # buat respon file
@@ -252,7 +271,7 @@ def export_csv():
             output.getvalue(),
             mimetype="text/csv",
             headers={
-                "Content-Disposition": "attachment; filename=readings.csv"
+                "Content-Disposition": "attachment; filename=activity.csv"
             }
         )
         return response
@@ -260,6 +279,7 @@ def export_csv():
     except Exception as e:
         print("CSV Export Error:", e)
         return Response("Error exporting CSV", status=500)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
