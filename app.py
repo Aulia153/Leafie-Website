@@ -46,17 +46,17 @@ def add_activity(msg):
         "desc": msg
     })
 
-def generate_reading():
-    """
-    Menghasilkan reading dengan field 'soil_moisture' agar sesuai dengan
-    dashboard.js dan dashboard.html
-    """
-    return {
-        "temperature": round(random.uniform(25, 31), 1),
-        "humidity": random.randint(50, 85),
-        "soil_moisture": random.randint(45, 80),
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
+# def generate_reading():
+#     """
+#     Menghasilkan reading dengan field 'soil_moisture' agar sesuai dengan
+#     dashboard.js dan dashboard.html
+#     """
+#     return {
+#         "temperature": round(random.uniform(25, 31), 1),
+#         "humidity": random.randint(50, 85),
+#         "soil_moisture": random.randint(45, 80),
+#         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#     }
 
 # ==== ROUTES ====
 @app.route("/")
@@ -68,27 +68,37 @@ def dashboard():
     if "user" not in session:
         return redirect(url_for("auth_bp.login"))
 
-    # generate dummy reading and simpan (sama dengan behavior sebelumnya)
-    reading = generate_reading()
+    # --- AMBIL DATA TERBARU DARI FIREBASE ---
     try:
-        db.child("readings").push(reading)
+        raw = db.child("sensor").get().val()
+        if raw:
+            # raw = { id: {...sensor data...} }
+            reading = raw
+        else:
+            reading = {
+                "temperature": "-",
+                "humidity": "-",
+                "soil_moisture": "-",
+                "timestamp": "-"
+            }
     except Exception as e:
-        # jangan crash bila koneksi firebase bermasalah
-        print("Warning: gagal push reading ke Firebase:", e)
+        print("Warning: gagal mengambil data dari Firebase:", e)
+        reading = {
+            "temperature": "-",
+            "humidity": "-",
+            "soil_moisture": "-",
+            "timestamp": "-"
+        }
 
-    # ambil activity terakhir (urut berdasarkan time)
-    activity_data = {}
+    # --- AMBIL ACTIVITY ---
     try:
-        # ambil semua lalu sortir berdasarkan time (string 'YYYY-MM-DD HH:MM:SS' -> lexicographic works)
         raw = db.child("activity").get().val()
         if raw:
-            # raw is dict {id: {time:..., desc:...}, ...}
             items = sorted(raw.items(), key=lambda kv: kv[1].get("time", ""))
-            activity_list = [v for k, v in items]  # list of {time, desc}
+            activity_list = [v for k, v in items]
         else:
             activity_list = []
-    except Exception as e:
-        print("Warning: gagal baca activity dari Firebase:", e)
+    except:
         activity_list = []
 
     return render_template(
@@ -103,15 +113,30 @@ def dashboard():
 
 @app.route("/api/sensor")
 def api_sensor():
-    reading = generate_reading()
     try:
-        db.child("readings").push(reading)
-    except Exception as e:
-        print("Warning: gagal push reading ke Firebase:", e)
+        raw = db.child("sensor").get().val()
+
+        # Jika raw adalah {randomKey: {...}}
+        if isinstance(raw, dict) and len(raw)==1 and isinstance(list(raw.values())[0], dict):
+            reading = list(raw.values())[0]
+        else:
+            reading = raw or {}
+
+    except:
+        reading = {}
+
+    # Pastikan semua field ada
+    reading.setdefault("temperature", 0)
+    reading.setdefault("humidity", 0)
+    reading.setdefault("soil_moisture", 0)
+    reading.setdefault("timestamp", "")
 
     reading["pump"] = get_state("pump")
     reading["camera"] = get_state("camera")
+
     return jsonify(reading)
+
+
 
 
 @app.route("/api/pump", methods=["POST"])
