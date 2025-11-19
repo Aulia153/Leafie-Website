@@ -11,7 +11,7 @@ firebase_config = {
     "apiKey": "AIzaSyAMLCngjVKhzpoWZ-rJorqcAmy1h48EdJQ",
     "authDomain": "leafie-project.firebaseapp.com",
     "projectId": "leafie-project",
-    "storageBucket": "leafie-project.firebasestorage.app",
+    "storageBucket": "leafie-project.appspot.com",
     "messagingSenderId": "392209039380",
     "appId": "1:392209039380:web:44114ae9fc22f882d96701",
     "databaseURL": "https://leafie-project-default-rtdb.firebaseio.com" 
