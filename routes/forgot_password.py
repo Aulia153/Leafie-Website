@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from firebase_config import auth
+from firebase_config import auth                  # Pyrebase
+from firebase_config import admin_auth       # Admin SDK
+
 import random, time, smtplib
 from email.mime.text import MIMEText
 
-# Buat blueprint
 forgot_bp = Blueprint('forgot_bp', __name__)
 
-# Simpan OTP di memori sementara (sementara, sebaiknya pakai DB di produksi)
+# Temporary OTP storage (gunakan DB utk production)
 otp_store = {}
 
 # === 1️⃣ LUPA PASSWORD ===
@@ -19,99 +20,104 @@ def lupa_password():
             flash('Email wajib diisi.', 'warning')
             return render_template('lupaPassword.html')
 
-        # 🔍 Cek apakah email terdaftar di Firebase
+        # 🔍 Cek email di Firebase via Admin SDK
         try:
-            user = auth.get_user_by_email(email)
+            admin_auth.get_user_by_email(email)
+        except admin_auth.UserNotFoundError:
+            flash('❌ Email tidak terdaftar.', 'danger')
+            return render_template('lupaPassword.html')
         except Exception as e:
-            print("Email tidak ditemukan di Firebase:", e)
-            flash('❌ Email tidak terdaftar. Silakan gunakan email yang valid.', 'danger')
+            print("Error cek email:", e)
+            flash("Terjadi kesalahan server.", "danger")
             return render_template('lupaPassword.html')
 
-        # ✅ Buat OTP & simpan
+        # Buat OTP
         otp = str(random.randint(100000, 999999))
         expiry = time.time() + 300  # 5 menit
-        otp_store[email] = {'otp': otp, 'expiry': expiry}
+        otp_store[email] = {"otp": otp, "expiry": expiry}
 
-        # ✅ Kirim OTP via email
+        # Kirim OTP ke email
         try:
             send_email(email, otp)
-            flash('✅ Kode OTP telah dikirim ke email Anda.', 'info')
+            flash("Kode OTP telah dikirim ke email Anda.", "info")
         except Exception as e:
-            flash(f'⚠️ Gagal mengirim email OTP: {e}', 'danger')
-            print("Error kirim email:", e)
+            flash("Gagal mengirim OTP.", "danger")
+            print("Email error:", e)
             return render_template('lupaPassword.html')
 
-        session['reset_email'] = email
-        return redirect(url_for('forgot_bp.verifikasi_otp'))
+        session["reset_email"] = email
+        return redirect(url_for("forgot_bp.verifikasi_otp"))
 
-    return render_template('lupaPassword.html')
+    return render_template("lupaPassword.html")
+
 
 # === 2️⃣ VERIFIKASI OTP ===
 @forgot_bp.route('/verifikasiOTP', methods=['GET', 'POST'])
 def verifikasi_otp():
-    email = session.get('reset_email')
+    email = session.get("reset_email")
     if not email:
-        flash('Sesi telah berakhir. Silakan ulangi proses.', 'warning')
-        return redirect(url_for('forgot_bp.lupa_password'))
+        flash("Sesi habis. Ulangi proses.", "warning")
+        return redirect(url_for("forgot_bp.lupa_password"))
 
     if request.method == 'POST':
-        otp_input = request.form.get('otp')
+        otp_input = request.form.get("otp")
         data = otp_store.get(email)
 
         if not data:
-            flash('OTP tidak ditemukan. Silakan kirim ulang.', 'danger')
-            return redirect(url_for('forgot_bp.lupa_password'))
+            flash("OTP tidak ditemukan.", "danger")
+            return redirect(url_for("forgot_bp.lupa_password"))
 
-        if data['otp'] == otp_input and time.time() < data['expiry']:
-            session['otp_verified'] = True
-            flash('OTP benar! Silakan atur password baru.', 'success')
-            return redirect(url_for('forgot_bp.reset_password'))
+        if data["otp"] == otp_input and time.time() < data["expiry"]:
+            session["otp_verified"] = True
+            flash("OTP benar! Silakan atur password baru.", "success")
+            return redirect(url_for("forgot_bp.reset_password"))
         else:
-            flash('OTP salah atau sudah kadaluarsa.', 'danger')
+            flash("OTP salah atau kadaluarsa.", "danger")
 
-    return render_template('verifikasiOTP.html')
+    return render_template("verifikasiOTP.html")
 
 
 # === 3️⃣ RESET PASSWORD ===
 @forgot_bp.route('/resetPassword', methods=['GET', 'POST'])
 def reset_password():
-    email = session.get('reset_email')
-    verified = session.get('otp_verified')
+    email = session.get("reset_email")
+    verified = session.get("otp_verified")
 
     if not email or not verified:
-        flash('Akses tidak sah. Silakan ulangi dari awal.', 'warning')
-        return redirect(url_for('forgot_bp.lupa_password'))
+        flash("Akses tidak sah.", "warning")
+        return redirect(url_for("forgot_bp.lupa_password"))
 
     if request.method == 'POST':
-        new_pass = request.form.get('password')
-        if not new_pass:
-            flash('Password baru wajib diisi.', 'warning')
-            return render_template('resetPss.html')
+        new_password = request.form.get("password")
+
+        if not new_password:
+            flash("Password wajib diisi.", "warning")
+            return render_template("resetPss.html")
 
         try:
-            # Firebase hanya mendukung kirim tautan reset password (bukan ubah langsung)
+            # Kirim link reset password default Firebase
             auth.send_password_reset_email(email)
-            flash('Tautan reset password telah dikirim ke email Anda.', 'info')
+            flash("Tautan reset password telah dikirim ke email Anda.", "info")
+
             session.clear()
-            return redirect(url_for('auth_bp.login'))
+            return redirect(url_for("auth_bp.login"))
         except Exception as e:
-            print('Error Firebase:', e)
-            flash('Gagal mengatur ulang password. Coba lagi.', 'danger')
+            print("Error reset password:", e)
+            flash("Gagal mengirim tautan reset password.", "danger")
 
-    return render_template('resetPss.html')
+    return render_template("resetPss.html")
 
-# fungsi resend_otp
+
+# === 4️⃣ RESEND OTP ===
 @forgot_bp.route('/resend_otp', methods=['POST'])
 def resend_otp():
-    email = session.get('reset_email')
+    email = session.get("reset_email")
+
     if not email:
         return {"status": "error", "message": "Sesi tidak ditemukan"}, 400
 
-    if email not in otp_store:
-        return {"status": "error", "message": "OTP tidak ditemukan"}, 400
-
     otp = str(random.randint(100000, 999999))
-    otp_store[email] = {'otp': otp, 'expiry': time.time() + 300}
+    otp_store[email] = {"otp": otp, "expiry": time.time() + 300}
 
     try:
         send_email(email, otp)
@@ -121,22 +127,19 @@ def resend_otp():
         return {"status": "error", "message": "Gagal mengirim email"}, 500
 
 
-# === 4️⃣ FUNGSI KIRIM EMAIL OTP ===
+# === 5️⃣ KIRIM EMAIL ===
 def send_email(to_email, otp):
     sender = "hanntok2802@gmail.com"
-    password = "uelj bbid eymw hnwl"  # gunakan App Password Gmail (bukan password biasa)
+    password = "uelj bbid eymw hnwl"  # Gmail App Password saja
 
-    msg = MIMEText(f"Kode OTP Anda adalah {otp}. Berlaku selama 5 menit.")
+    msg = MIMEText(f"Kode OTP Anda: {otp}\nBerlaku 5 menit.")
     msg["Subject"] = "Reset Password - Leafie"
     msg["From"] = sender
     msg["To"] = to_email
-    
-    try:
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(sender, password)
-            server.send_message(msg)
-        print(f"[✅ EMAIL TERKIRIM] ke {to_email} — OTP: {otp}")
-    except Exception as e:
-        print("[❌ GAGAL KIRIM EMAIL]:", e)
-        raise e  # biar error bisa ditangkap di route
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()
+        server.login(sender, password)
+        server.send_message(msg)
+
+    print(f"[EMAIL TERKIRIM] OTP {otp} → {to_email}")
