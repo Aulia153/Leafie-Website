@@ -1,3 +1,6 @@
+/* ============================
+   GLOBAL STYLE
+============================ */
 * {
     margin: 0;
     padding: 0;
@@ -12,62 +15,62 @@ body {
     flex-direction: column;
 }
 
-/* ===== HEADER ===== */
+/* ============================
+   HEADER
+============================ */
 header {
-  background: linear-gradient(135deg, #6b7c6e 0%, #5a6b5d 100%);
+  background-color: #1b5e20; /* hijau daun tua seperti contoh kamu */
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* LOGO SECTION */
 .logo-section {
   display: flex;
   align-items: center;
   gap: 0.8rem;
 }
 
-/* MENU SECTION */
-.navbar-menu {
+.logo {
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
-  gap: 2rem;
+  justify-content: center;
 }
 
-.navbar-menu a {
-  color: white;
+.logo img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.logo-text {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.nav-link {
+  color: #ffffff;
   text-decoration: none;
-  font-size: 1.05rem;
-  font-weight: 500;
-  transition: opacity 0.3s ease;
-  background: transparent;
-  border: none;
+  font-size: 1rem;
   padding: 0;
+  border: none !important;
+  border-radius: 0;
+  transition: all 0.3s ease;
 }
 
-.navbar-menu a:hover {
-  opacity: 0.7;
-  text-decoration: underline;
+.nav-link:hover {
+  color: #ffff;
+  font-weight: 600;
 }
 
-/* RESPONSIVE HEADER */
-@media (max-width: 640px) {
-
-  header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .navbar-menu {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-}
-
-/* Main Content */
+/* ============================
+   MAIN CONTENT
+============================ */
 main {
     flex: 1;
     display: flex;
@@ -102,6 +105,7 @@ main {
     line-height: 1.6;
 }
 
+/* OTP Form Box */
 .otp-form-container {
     background: white;
     padding: 3rem;
@@ -113,22 +117,23 @@ main {
     margin-bottom: 1.5rem;
 }
 
+/* Input */
 label {
     display: block;
     margin-bottom: 0.5rem;
     color: #2c3e2f;
-    font-weight: 600;
     font-size: 0.95rem;
+    font-weight: 600;
 }
 
 input[type="text"] {
     width: 100%;
     padding: 0.9rem 1rem;
+    font-size: 1rem;
     border: 2px solid #d4d4ce;
     border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s;
     background-color: #fafaf8;
+    transition: 0.3s;
 }
 
 input[type="text"]:focus {
@@ -138,12 +143,12 @@ input[type="text"]:focus {
 }
 
 .hint-text {
-    display: block;
     margin-top: 0.5rem;
     font-size: 0.85rem;
     color: #7a8b7d;
 }
 
+/* Buttons */
 .button-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -153,22 +158,22 @@ input[type="text"]:focus {
 
 .btn {
     padding: 1rem;
-    border: none;
-    border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: 0.3s;
+    border: none;
 }
 
 .btn-resend {
-    background-color: white;
+    background: white;
     color: #6b7c6e;
     border: 2px solid #d4d4ce;
 }
 
 .btn-resend:hover {
-    background-color: #f5f5f0;
+    background: #f5f5f0;
     border-color: #6b7c6e;
 }
 
@@ -182,9 +187,11 @@ input[type="text"]:focus {
     box-shadow: 0 4px 12px rgba(107, 124, 110, 0.3);
 }
 
-/* Footer */
+/* ============================
+   FOOTER
+============================ */
 footer {
-    background-color: white;
+    background: white;
     padding: 1.5rem 2rem;
     display: flex;
     justify-content: space-between;
@@ -194,7 +201,7 @@ footer {
     gap: 1rem;
 }
 
-.copyright {
+copyright {
     color: #5a6b5d;
     font-size: 0.95rem;
 }
@@ -206,16 +213,18 @@ footer {
 
 .footer-links a {
     color: #2c3e2f;
-    text-decoration: none;
     font-size: 0.95rem;
-    transition: color 0.3s;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
 .footer-links a:hover {
     color: #6b7c6e;
 }
 
-/* Responsive Design */
+/* ============================
+   RESPONSIVE
+============================ */
 @media (max-width: 968px) {
     .otp-container {
         grid-template-columns: 1fr;
@@ -224,7 +233,6 @@ footer {
 
     .otp-info {
         text-align: center;
-        padding: 1rem;
     }
 
     .otp-info h1 {
@@ -234,23 +242,12 @@ footer {
 
 @media (max-width: 640px) {
     header {
-        padding: 1rem;
-    }
-
-    .logo-text {
-        font-size: 1.2rem;
+        flex-direction: column;
+        gap: 1rem;
     }
 
     .otp-info h1 {
         font-size: 2rem;
-    }
-
-    .otp-info p {
-        font-size: 1rem;
-    }
-
-    .otp-form-container {
-        padding: 2rem 1.5rem;
     }
 
     .button-group {
@@ -260,7 +257,6 @@ footer {
     footer {
         flex-direction: column;
         text-align: center;
-        gap: 1rem;
     }
 
     .footer-links {
@@ -272,10 +268,6 @@ footer {
 @media (max-width: 480px) {
     main {
         padding: 1rem;
-    }
-
-    .otp-info h1 {
-        font-size: 1.8rem;
     }
 
     .otp-form-container {
