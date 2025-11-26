@@ -102,7 +102,7 @@
                src="http://192.168.74.253:81/stream"
                alt="Live Camera"
                class="camera-frame"
-               onerror="this.src='/static/image/default_leaf.jpg'">
+               onerror="this.src='/static/gambar/default_leaf.jpg'">
         </div>
 
         <div class="card camera-control">
@@ -111,6 +111,9 @@
           </button>
 
           <button id="captureLeafBtn" class="btn">Ambil Foto Daun</button>
+
+          <label class="btn mt-2" for="uploadLeafInput">Upload Gambar Daun</label>
+          <input type="file" id="uploadLeafInput" accept="static/gambar/*" style="display: none;">
         </div>
       </div>
     </section>
@@ -133,7 +136,7 @@
             <img id="leafImage"
                  alt="Daun terbaru"
                  class="leaf-img"
-                 onerror="this.src='/static/image/default_leaf.jpg'">
+                 onerror="this.src='/static/gambar/default_leaf.jpg'">
           </div>
 
         </div>

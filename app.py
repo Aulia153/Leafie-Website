@@ -5,6 +5,7 @@ import csv
 from datetime import datetime
 from io import StringIO
 from flask import Flask, render_template, session, redirect, url_for, jsonify, request, Response
+from werkzeug.utils import secure_filename
 
 from firebase_config import db   # <-- pastikan ini adalah client Realtime Database (pyrebase/etc.)
 
@@ -53,19 +54,6 @@ def add_activity(message, type="general"):
         db.child("activity").push(payload)
     except Exception as e:
         print("Warning: gagal push activity ke Firebase:", e)
-
-
-# def generate_reading():
-#     """
-#     Menghasilkan reading dengan field 'soil_moisture' agar sesuai dengan
-#     dashboard.js dan dashboard.html
-#     """
-#     return {
-#         "temperature": round(random.uniform(25, 31), 1),
-#         "humidity": random.randint(50, 85),
-#         "soil_moisture": random.randint(45, 80),
-#         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-#     }
 
 # ==== ROUTES ====
 @app.route("/")
@@ -150,8 +138,6 @@ def api_sensor():
     return jsonify(reading)
 
 
-
-
 @app.route("/api/pump", methods=["POST"])
 def api_pump():
     current = get_state("pump")
@@ -160,6 +146,13 @@ def api_pump():
     add_activity(f"Pompa diubah menjadi {new}", type="pump")
     return jsonify({"pump": new})
 
+@app.route("/api/camera", methods=["POST"])
+def api_camera():
+    current = get_state("camera")
+    new = "OFF" if current == "ON" else "ON"
+    set_state("camera", new)
+    add_activity(f"Kamera diubah menjadi {new}", type="camera")
+    return jsonify({"camera": new})
 
 @app.route("/capture_leaf", methods=["POST"])
 def capture_leaf():
@@ -179,21 +172,46 @@ def capture_leaf():
 
         return jsonify({
             "success": True,
-            "path": "/static/image/leaf_latest.jpg"
+            "path": "/static/gambar/leaf_latest.jpg"
         })
 
     except Exception as e:
         print("Error capture:", e)
         return jsonify({"success": False}), 500
 
+# ==== UPLOAD GAMBAR DAUN ====
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+MAX_UPLOAD_SIZE = 5 * 1024 * 1024
 
-@app.route("/api/camera", methods=["POST"])
-def api_camera():
-    current = get_state("camera")
-    new = "OFF" if current == "ON" else "ON"
-    set_state("camera", new)
-    add_activity(f"Kamera diubah menjadi {new}", type="camera")
-    return jsonify({"camera": new})
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route("/upload_leaf", methods=["POST"])
+def upload_leaf():
+    try:
+        if "image" not in request.files:
+            return jsonify({"success": False, "message": "Tidak ada file dikirim"}), 400
+
+        file = request.files["image"]
+        if file.filename == "":
+            return jsonify({"success": False, "message": "Nama file kosong"}), 400
+
+        if not allowed_file(file.filename):
+            return jsonify({"success": False, "message": "Format file tidak didukung"}), 400
+
+        if request.content_length and request.content_length > MAX_UPLOAD_SIZE:
+            return jsonify({"success": False, "message": "File terlalu besar (max 5 MB)"}), 413
+
+        filename = "leaf_latest.jpg"
+        save_path = os.path.join(STATIC_IMG_DIR, secure_filename(filename))
+        file.save(save_path)
+
+        add_activity("Gambar daun di-upload manual oleh user", type="camera")
+
+        return jsonify({"success": True, "message": "Upload berhasil", "path": "/static/gambar/leaf_latest.jpg"})
+    except Exception as e:
+        print("Upload error:", e)
+        return jsonify({"success": False, "message": "Terjadi kesalahan server"}), 500
 
 
 @app.route("/api/detect_leaf", methods=["POST"])
@@ -238,7 +256,7 @@ def detect_leaf():
         "status": status,
         "result": result,
         "message": message,
-        "image": "/static/image/leaf_latest.jpg"
+        "image": "/static/gambar/leaf_latest.jpg"
     })
 
 

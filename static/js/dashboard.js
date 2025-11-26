@@ -18,6 +18,7 @@ const el = {
   exportBtn: qs('#exportBtn'),
 
   leafStatus: qs('#leafHealthStatus'),
+  uploadLeaf: qs('#uploadLeafInput'),
 
   filterButtons: '[data-filter]'
 };
@@ -233,6 +234,54 @@ async function captureLeaf() {
 }
 
 /* =========================================================
+   UPLOAD LEAF IMAGE (MANUAL)
+========================================================= */
+async function uploadLeafImage() {
+  const file = el.uploadLeaf?.files?.[0];
+  if (!file) return;
+
+  // Preview langsung sebelum diproses
+  el.leafImg.src = URL.createObjectURL(file);
+  el.leafStatus.textContent = 'Mengunggah & menganalisis...';
+  el.leafStatus.classList.remove('healthy', 'unhealthy');
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const res = await fetch('/upload_leaf', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      el.leafStatus.textContent = 'Upload gagal';
+      prependActivity('leaf', '❗ Upload daun gagal');
+      return;
+    }
+
+    // Update foto jika backend memberikan path
+    if (data.image) el.leafImg.src = `${data.image}?t=${Date.now()}`;
+
+    el.leafStatus.textContent = `${data.result} — ${data.message}`;
+    if (data.status === 'HEALTHY') {
+      el.leafStatus.classList.add('healthy');
+      prependActivity('leaf', `Upload & deteksi: SEHAT — ${data.result}`);
+    } else {
+      el.leafStatus.classList.add('unhealthy');
+      prependActivity('leaf', `Upload & deteksi: TIDAK SEHAT — ${data.result}`);
+      alert('⚠️ Hasil menunjukkan daun tidak sehat!');
+    }
+
+  } catch (err) {
+    console.error(err);
+    el.leafStatus.textContent = 'Error deteksi';
+    prependActivity('leaf', '❗ Error upload / deteksi daun');
+  }
+}
+
+/* =========================================================
    LEAF HEALTH DETECTION
 ========================================================= */
 async function detectLeaf() {
@@ -307,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   el.btnPump?.addEventListener('click', togglePump);
   el.btnCapture?.addEventListener('click', captureLeaf);
+  el.uploadLeaf?.addEventListener('change', uploadLeafImage);
   el.cameraBtn?.addEventListener('click', toggleCamera);
   el.exportBtn?.addEventListener('click', exportCSV);
 
