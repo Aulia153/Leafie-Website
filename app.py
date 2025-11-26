@@ -25,7 +25,7 @@ STATIC_IMG_DIR = os.path.join(BASE_DIR, "static", "image")
 os.makedirs(STATIC_IMG_DIR, exist_ok=True)
 
 # ==== ESP32 CONFIG ====
-ESP32_IP = "192.168.100.201"
+ESP32_IP = "192.168.74.253"
 ESP32_STREAM_URL = f"http://{ESP32_IP}:81/stream"
 ESP32_CAPTURE_URL = f"http://{ESP32_IP}/capture"
 
