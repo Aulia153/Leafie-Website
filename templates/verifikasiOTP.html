@@ -39,7 +39,7 @@
                             type="text"
                             id="otp"
                             name="otp"
-                            placeholder="Masukkan kode OTP di sini"
+                            placeholder=""
                             maxlength="6"
                             required
                         >
@@ -66,7 +66,6 @@
     </footer>
 
     <script>
-        // Kirim ulang OTP (tanpa reload halaman)
         async function resendOTP() {
             const res = await fetch("/resend_otp", { method: "POST" });
             if (res.ok) {
@@ -76,7 +75,6 @@
             }
         }
 
-        // Validasi OTP sebelum submit
         document.getElementById("otpForm").addEventListener("submit", function (e) {
             const otp = document.getElementById("otp").value.trim();
             if (otp.length !== 6 || isNaN(otp)) {

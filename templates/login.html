@@ -10,16 +10,15 @@
 
 <body>
     <!-- Header -->
-<header>
-  <div class="logo-section">
-    <div class="logo">
-      <!-- pakai gambar -->
-      <img src="/static/image/logo.png" alt="Logo" id="siteLogo" />
-    </div>
-    <div class="logo-text">Login</div>
-  </div>
-  <a href="/" class="nav-link">Home</a>
-</header>
+    <header>
+        <div class="logo-section">
+            <div class="logo">
+                <img src="/static/image/logo.png" alt="Logo" id="siteLogo" />
+            </div>
+            <div class="logo-text">Leafie</div>
+        </div>
+        <a href="/" class="nav-link">Home</a>
+    </header>
 
     <!-- Main Content -->
     <main>
@@ -27,14 +26,14 @@
             <!-- Login Info -->
             <div class="login-info">
                 <h1>User Login</h1>
-                <p>Silakan masukkan kredensial Anda untuk mengakses dashboard pertanian Anda.</p>
+                <p>Silakan masukkan email dan password Anda untuk mengakses dashboard pertanian Anda.</p>
             </div>
 
             <!-- Login Form -->
             <div class="login-form-container">
                 <form id="loginForm" method="POST" action="/login">
                     <div class="form-group">
-                        <label for="Email">Email</label>
+                        <label for="username">Email</label>
                         <input type="text" id="username" name="email" placeholder="Masukkan Email Anda" required>
                     </div>
 
@@ -43,32 +42,31 @@
                         <input type="password" id="password" name="password" placeholder="Masukkan Password Anda"
                             required>
                     </div>
+                    <!-- Pesan Login (dipindah ke dalam form container) -->
+                    <div class="flash-messages">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                    </div>
 
                     <div class="button-group">
-                        <button type="button" class="btn btn-forgot">Lupa Password?</button>
+                        <button type="button" class="btn btn-forgot" onclick="window.location.href='/lupaPassword'">
+                            Lupa Password?
+                        </button>
                         <button type="submit" class="btn btn-login">Login</button>
                     </div>
                 </form>
             </div>
         </div>
-
-        <!-- Pesan Login -->
-        <div class="flash-messages">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <p class="{{ category }}">{{ message }}</p>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-        </div>
-
     </main>
 
     <!-- Footer -->
     <footer>
         <div class="copyright">© 2025 Leafie — All Rights Reserved</div>
-        </div>
     </footer>
 </body>
 

@@ -4,6 +4,7 @@ from firebase_config import admin_auth       # Admin SDK
 
 import random, time, smtplib
 from email.mime.text import MIMEText
+from firebase_config import admin_auth, auth
 
 forgot_bp = Blueprint('forgot_bp', __name__)
 
@@ -95,15 +96,23 @@ def reset_password():
             return render_template("resetPss.html")
 
         try:
-            # Kirim link reset password default Firebase
-            auth.send_password_reset_email(email)
-            flash("Tautan reset password telah dikirim ke email Anda.", "info")
+            # 🔍 Ambil user berdasarkan email
+            user = admin_auth.get_user_by_email(email)
+
+            # 🔧 Update password langsung dari server
+            admin_auth.update_user(
+                user.uid,
+                password=new_password
+            )
+
+            flash("Password berhasil diganti! Silakan login.", "success")
 
             session.clear()
             return redirect(url_for("auth_bp.login"))
+
         except Exception as e:
-            print("Error reset password:", e)
-            flash("Gagal mengirim tautan reset password.", "danger")
+            print("Error update password:", e)
+            flash("Gagal mengganti password.", "danger")
 
     return render_template("resetPss.html")
 
