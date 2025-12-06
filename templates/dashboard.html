@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leafie — Dashboard</title>
-
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='image/logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
@@ -97,7 +97,7 @@
       <div class="grid-2">
         <div class="card camera-card">
           <img id="cameraFeed"
-              src="http://10.214.26.253:81/stream"
+              src="http://192.168.113.253:81/stream"
               alt="Live Camera"
               class="camera-frame"
               onerror="this.src='/static/gambar/default_leaf.jpg'">

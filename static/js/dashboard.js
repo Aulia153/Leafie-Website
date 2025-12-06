@@ -127,7 +127,7 @@ async function pollSensor() {
 
     el.soilStatus.textContent =
       data.soil_moisture > 70 ? 'Basah' :
-      data.soil_moisture < 50 ? 'Kering' : 'Stabil';
+      data.soil_moisture <= 45 ? 'Kering' : 'Lembap';
 
     const timeLabel = data.timestamp.split(' ')[1] || '';
     pushToChart(tempChart, timeLabel, data.temperature);

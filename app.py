@@ -32,7 +32,7 @@ MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max untuk Flask
 
 # ==== ESP32 CONFIG ====
-ESP32_IP = "10.214.26.253"
+ESP32_IP = "192.168.113.253"
 ESP32_STREAM_URL = f"http://{ESP32_IP}:81/stream"
 ESP32_CAPTURE_URL = f"http://{ESP32_IP}/capture"
 
